@@ -26,12 +26,12 @@
           #         - pause:
           #               minutes: 1
 
-          #         - name: Obten IP
-          #           command: ./virt-addr.sh {{ inventory_hostname }}
-          #           delegate_to: localhost
-          #           connection: local
-          #           become: yes
-          #           register: vm_ip
+          - name: Obten IP
+            command: ./virt-addr.sh {{ inventory_hostname }}
+            delegate_to: localhost
+            connection: local
+            become: yes
+            register: vm_ip
 
           - name: Change name
             hostname: name={{ inventory_hostname }}
