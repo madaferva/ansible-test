@@ -1,0 +1,47 @@
+---
+- name: Despliegue de VMs
+  hosts: all
+  gather_facts: no 
+  serial: 1
+  remote_user: root
+
+  # #  vars:
+  #         template: sles12sp2-template
+
+  tasks:
+
+          #         - name: Crea maquina virtual
+          #           shell: virt-clone  --auto-clone --original {{ template }} --name {{ inventory_hostname }}
+          #           delegate_to: localhost
+          #           connection: local
+          #           become: yes
+
+
+          #         - name: Enciende máquina virtual
+          #           shell: virsh start {{ inventory_hostname }}
+          #           delegate_to: localhost
+          #           connection: local
+          #           become: yes
+
+          #         - pause:
+          #               minutes: 1
+
+          #         - name: Obten IP
+          #           command: ./virt-addr.sh {{ inventory_hostname }}
+          #           delegate_to: localhost
+          #           connection: local
+          #           become: yes
+          #           register: vm_ip
+
+          - name: Change name
+            hostname: name={{ inventory_hostname }}
+            delegate_to: "{{ vm_ip.stdout }}"
+
+          - name: Create hosts file
+            lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_ssh_host }} {{item}}" state=present
+            when: hostvars[item].ansible_ssh_host  is defined
+            with_items: "{{ groups['HA'] }}"
+            delegate_to: "{{ vm_ip.stdout }}"
+
+          - name: Debug
+            debug: var=vm_ip
